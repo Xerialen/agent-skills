@@ -17,17 +17,17 @@ OpenCode uses a **skill-driven execution model** powered by the `skill` tool and
 - Never implement directly if a skill applies
 - Always follow the skill instructions exactly (do not partially apply them)
 
-### Intent → Skill Mapping
+### Intent â†’ Skill Mapping
 
 The agent should automatically map user intent to skills:
 
-- Feature / new functionality → `spec-driven-development`, then `incremental-implementation`, `test-driven-development`
-- Planning / breakdown → `planning-and-task-breakdown`
-- Bug / failure / unexpected behavior → `debugging-and-error-recovery`
-- Code review → `code-review-and-quality`
-- Refactoring / simplification → `code-simplification`
-- API or interface design → `api-and-interface-design`
-- UI work → `frontend-ui-engineering`
+- Feature / new functionality â†’ `spec-driven-development`, then `incremental-implementation`, `test-driven-development`
+- Planning / breakdown â†’ `planning-and-task-breakdown`
+- Bug / failure / unexpected behavior â†’ `debugging-and-error-recovery`
+- Code review â†’ `code-review-and-quality`
+- Refactoring / simplification â†’ `code-simplification`
+- API or interface design â†’ `api-and-interface-design`
+- UI work â†’ `frontend-ui-engineering`
 
 ### Lifecycle Mapping (Implicit Commands)
 
@@ -35,12 +35,12 @@ OpenCode does not support slash commands like `/spec` or `/plan`.
 
 Instead, the agent must internally follow this lifecycle:
 
-- DEFINE → `spec-driven-development`
-- PLAN → `planning-and-task-breakdown`
-- BUILD → `incremental-implementation` + `test-driven-development`
-- VERIFY → `debugging-and-error-recovery`
-- REVIEW → `code-review-and-quality`
-- SHIP → `shipping-and-launch`
+- DEFINE â†’ `spec-driven-development`
+- PLAN â†’ `planning-and-task-breakdown`
+- BUILD â†’ `incremental-implementation` + `test-driven-development`
+- VERIFY â†’ `debugging-and-error-recovery`
+- REVIEW â†’ `code-review-and-quality`
+- SHIP â†’ `shipping-and-launch`
 
 ### Execution Model
 
@@ -57,7 +57,7 @@ The following thoughts are incorrect and must be ignored:
 
 - "This is too small for a skill"
 - "I can just quickly implement this"
-- "I’ll gather context first"
+- "Iâ€™ll gather context first"
 
 Correct behavior:
 
@@ -69,13 +69,13 @@ This ensures OpenCode behaves similarly to Claude Code with full workflow enforc
 
 This repo has three composable layers. They have different jobs and should not be confused:
 
-- **Skills** (`skills/<name>/SKILL.md`) — workflows with steps and exit criteria. The *how*. Mandatory hops when an intent matches.
-- **Personas** (`agents/<role>.md`) — roles with a perspective and an output format. The *who*.
-- **Slash commands** (`.claude/commands/*.md`) — user-facing entry points. The *when*. The orchestration layer.
+- **Skills** (`skills/<name>/SKILL.md`) â€” workflows with steps and exit criteria. The *how*. Mandatory hops when an intent matches.
+- **Personas** (`agents/<role>.md`) â€” roles with a perspective and an output format. The *who*.
+- **Slash commands** (`.claude/commands/*.md`) â€” user-facing entry points. The *when*. The orchestration layer.
 
 Composition rule: **the user (or a slash command) is the orchestrator. Personas do not invoke other personas.** A persona may invoke skills.
 
-The only multi-persona orchestration pattern this repo endorses is **parallel fan-out with a merge step** — used by `/ship` to run `code-reviewer`, `security-auditor`, and `test-engineer` concurrently and synthesize their reports. Do not build a "router" persona that decides which other persona to call; that's the job of slash commands and intent mapping.
+The only multi-persona orchestration pattern this repo endorses is **parallel fan-out with a merge step** â€” used by `/ship` to run `code-reviewer`, `security-auditor`, and `test-engineer` concurrently and synthesize their reports. Do not build a "router" persona that decides which other persona to call; that's the job of slash commands and intent mapping.
 
 See [agents/README.md](agents/README.md) for the decision matrix and [references/orchestration-patterns.md](references/orchestration-patterns.md) for the full pattern catalog.
 
@@ -148,13 +148,13 @@ bash /mnt/skills/user/{skill-name}/scripts/{script}.sh [args]
 
 ### Best Practices for Context Efficiency
 
-Skills are loaded on-demand — only the skill name and description are loaded at startup. The full `SKILL.md` loads into context only when the agent decides the skill is relevant. To minimize context usage:
+Skills are loaded on-demand â€” only the skill name and description are loaded at startup. The full `SKILL.md` loads into context only when the agent decides the skill is relevant. To minimize context usage:
 
-- **Keep SKILL.md under 500 lines** — put detailed reference material in separate files
-- **Write specific descriptions** — helps the agent know exactly when to activate the skill
-- **Use progressive disclosure** — reference supporting files that get read only when needed
-- **Prefer scripts over inline code** — script execution doesn't consume context (only output does)
-- **File references work one level deep** — link directly from SKILL.md to supporting files
+- **Keep SKILL.md under 500 lines** â€” put detailed reference material in separate files
+- **Write specific descriptions** â€” helps the agent know exactly when to activate the skill
+- **Use progressive disclosure** â€” reference supporting files that get read only when needed
+- **Prefer scripts over inline code** â€” script execution doesn't consume context (only output does)
+- **File references work one level deep** â€” link directly from SKILL.md to supporting files
 
 ### Script Requirements
 
@@ -187,3 +187,44 @@ cp -r skills/{skill-name} ~/.claude/skills/
 Add the skill to project knowledge or paste SKILL.md contents into the conversation.
 
 If the skill requires network access, instruct users to add required domains at `claude.ai/settings/capabilities`.
+
+<!-- codex-review-gate:start -->
+## Review Gate Contract
+
+This repository uses the same gate flow as `Xerialen/komodobots`:
+
+- New or updated PRs are reset to `gate: reviewing`.
+- A reviewer reviews only the current head SHA.
+- The reviewer applies exactly one terminal label when warranted: `gate: ready` or `gate: blocked`.
+- Draft PRs must never receive `gate: ready`.
+- A deterministic GitHub Action merges only when the PR is open, non-draft, targets the repository default branch, has `gate: ready`, lacks `gate: blocked`, has a current-head SHA-bound PASS comment, and all non-gate checks including `PR Tests` are green.
+- New commits make earlier gate decisions stale and require reassessment.
+
+Role separation:
+
+- Coder implements.
+- Reviewer reviews technical merge safety.
+- Merge executor only merges after the deterministic gate passes.
+- Codex-authored PRs require independent non-Codex review before being treated as independently reviewed.
+
+Whenever Codex posts a GitHub issue, PR, PR review, review comment, issue comment, or merge/gate comment through `@Xerialen`, include this visible line:
+
+`_Posted by Codex via @Xerialen._`
+
+Required gate comment format:
+
+```text
+## Decision
+DECISION: BLOCK | PASS
+## Label applied
+LABEL: gate: blocked | gate: ready
+## Reviewed head SHA
+HEAD_SHA: <current PR head sha>
+## Blocking findings
+For each (or "None."): Severity / File-area / Problem / Why this blocks merge / Required fix.
+## Non-blocking notes
+Concrete technical notes only (or "None.").
+```
+
+Before applying a gate decision, classify whether the PR is ML-impacting. If it touches data extraction, datasets, training, model behavior, evaluation, metrics, inference, ML documentation, or evidence ledgers, read and apply `machine-learning-reviewer.md`. For non-ML PRs, say explicitly that the PR is not ML-impacting.
+<!-- codex-review-gate:end -->
