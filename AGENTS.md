@@ -17,17 +17,17 @@ OpenCode uses a **skill-driven execution model** powered by the `skill` tool and
 - Never implement directly if a skill applies
 - Always follow the skill instructions exactly (do not partially apply them)
 
-### Intent â†’ Skill Mapping
+### Intent Ã¢â€ â€™ Skill Mapping
 
 The agent should automatically map user intent to skills:
 
-- Feature / new functionality â†’ `spec-driven-development`, then `incremental-implementation`, `test-driven-development`
-- Planning / breakdown â†’ `planning-and-task-breakdown`
-- Bug / failure / unexpected behavior â†’ `debugging-and-error-recovery`
-- Code review â†’ `code-review-and-quality`
-- Refactoring / simplification â†’ `code-simplification`
-- API or interface design â†’ `api-and-interface-design`
-- UI work â†’ `frontend-ui-engineering`
+- Feature / new functionality Ã¢â€ â€™ `spec-driven-development`, then `incremental-implementation`, `test-driven-development`
+- Planning / breakdown Ã¢â€ â€™ `planning-and-task-breakdown`
+- Bug / failure / unexpected behavior Ã¢â€ â€™ `debugging-and-error-recovery`
+- Code review Ã¢â€ â€™ `code-review-and-quality`
+- Refactoring / simplification Ã¢â€ â€™ `code-simplification`
+- API or interface design Ã¢â€ â€™ `api-and-interface-design`
+- UI work Ã¢â€ â€™ `frontend-ui-engineering`
 
 ### Lifecycle Mapping (Implicit Commands)
 
@@ -35,12 +35,12 @@ OpenCode does not support slash commands like `/spec` or `/plan`.
 
 Instead, the agent must internally follow this lifecycle:
 
-- DEFINE â†’ `spec-driven-development`
-- PLAN â†’ `planning-and-task-breakdown`
-- BUILD â†’ `incremental-implementation` + `test-driven-development`
-- VERIFY â†’ `debugging-and-error-recovery`
-- REVIEW â†’ `code-review-and-quality`
-- SHIP â†’ `shipping-and-launch`
+- DEFINE Ã¢â€ â€™ `spec-driven-development`
+- PLAN Ã¢â€ â€™ `planning-and-task-breakdown`
+- BUILD Ã¢â€ â€™ `incremental-implementation` + `test-driven-development`
+- VERIFY Ã¢â€ â€™ `debugging-and-error-recovery`
+- REVIEW Ã¢â€ â€™ `code-review-and-quality`
+- SHIP Ã¢â€ â€™ `shipping-and-launch`
 
 ### Execution Model
 
@@ -57,7 +57,7 @@ The following thoughts are incorrect and must be ignored:
 
 - "This is too small for a skill"
 - "I can just quickly implement this"
-- "Iâ€™ll gather context first"
+- "IÃ¢â‚¬â„¢ll gather context first"
 
 Correct behavior:
 
@@ -69,13 +69,13 @@ This ensures OpenCode behaves similarly to Claude Code with full workflow enforc
 
 This repo has three composable layers. They have different jobs and should not be confused:
 
-- **Skills** (`skills/<name>/SKILL.md`) â€” workflows with steps and exit criteria. The *how*. Mandatory hops when an intent matches.
-- **Personas** (`agents/<role>.md`) â€” roles with a perspective and an output format. The *who*.
-- **Slash commands** (`.claude/commands/*.md`) â€” user-facing entry points. The *when*. The orchestration layer.
+- **Skills** (`skills/<name>/SKILL.md`) Ã¢â‚¬â€ workflows with steps and exit criteria. The *how*. Mandatory hops when an intent matches.
+- **Personas** (`agents/<role>.md`) Ã¢â‚¬â€ roles with a perspective and an output format. The *who*.
+- **Slash commands** (`.claude/commands/*.md`) Ã¢â‚¬â€ user-facing entry points. The *when*. The orchestration layer.
 
 Composition rule: **the user (or a slash command) is the orchestrator. Personas do not invoke other personas.** A persona may invoke skills.
 
-The only multi-persona orchestration pattern this repo endorses is **parallel fan-out with a merge step** â€” used by `/ship` to run `code-reviewer`, `security-auditor`, and `test-engineer` concurrently and synthesize their reports. Do not build a "router" persona that decides which other persona to call; that's the job of slash commands and intent mapping.
+The only multi-persona orchestration pattern this repo endorses is **parallel fan-out with a merge step** Ã¢â‚¬â€ used by `/ship` to run `code-reviewer`, `security-auditor`, and `test-engineer` concurrently and synthesize their reports. Do not build a "router" persona that decides which other persona to call; that's the job of slash commands and intent mapping.
 
 See [agents/README.md](agents/README.md) for the decision matrix and [references/orchestration-patterns.md](references/orchestration-patterns.md) for the full pattern catalog.
 
@@ -148,13 +148,13 @@ bash /mnt/skills/user/{skill-name}/scripts/{script}.sh [args]
 
 ### Best Practices for Context Efficiency
 
-Skills are loaded on-demand â€” only the skill name and description are loaded at startup. The full `SKILL.md` loads into context only when the agent decides the skill is relevant. To minimize context usage:
+Skills are loaded on-demand Ã¢â‚¬â€ only the skill name and description are loaded at startup. The full `SKILL.md` loads into context only when the agent decides the skill is relevant. To minimize context usage:
 
-- **Keep SKILL.md under 500 lines** â€” put detailed reference material in separate files
-- **Write specific descriptions** â€” helps the agent know exactly when to activate the skill
-- **Use progressive disclosure** â€” reference supporting files that get read only when needed
-- **Prefer scripts over inline code** â€” script execution doesn't consume context (only output does)
-- **File references work one level deep** â€” link directly from SKILL.md to supporting files
+- **Keep SKILL.md under 500 lines** Ã¢â‚¬â€ put detailed reference material in separate files
+- **Write specific descriptions** Ã¢â‚¬â€ helps the agent know exactly when to activate the skill
+- **Use progressive disclosure** Ã¢â‚¬â€ reference supporting files that get read only when needed
+- **Prefer scripts over inline code** Ã¢â‚¬â€ script execution doesn't consume context (only output does)
+- **File references work one level deep** Ã¢â‚¬â€ link directly from SKILL.md to supporting files
 
 ### Script Requirements
 
